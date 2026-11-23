@@ -7,15 +7,15 @@ import { Dashboard } from '@turborepo-remote-cache/dashboard/dashboard';
 import { useMemo, useState } from 'react';
 
 import { demoStats } from '../lib/demo-stats';
-import { useSeen } from '../lib/playback';
+import { useMounted } from '../lib/playback';
 
-export const client = 'visible';
+export const client = 'load';
 
 export default function DashboardPreview() {
+  const mounted = useMounted();
   const [range, setRange] = useState<StatsRange>('30d');
   const stats = useMemo(() => demoStats(range), [range]);
-  // Mounting on first sight lets the dashboard's numbers count up while someone watches.
-  const { ref, seen } = useSeen<HTMLDivElement>();
+
   return (
     <figure
       data-dashboard
@@ -36,11 +36,11 @@ export default function DashboardPreview() {
         </span>
         <span className="w-[2.625rem]" aria-hidden />
       </div>
-      <div ref={ref} className="relative h-[56rem] overflow-hidden px-5 sm:px-8">
-        {seen ? <Dashboard stats={stats} onRangeChange={setRange} /> : null}
+      <div className="relative h-[34rem] overflow-hidden px-4 sm:h-[46rem] sm:px-8 lg:h-[54rem]">
+        {mounted ? <Dashboard stats={stats} onRangeChange={setRange} /> : null}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-background to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-background to-transparent"
         />
       </div>
     </figure>

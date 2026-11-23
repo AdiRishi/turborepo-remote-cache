@@ -9,8 +9,8 @@ Prefer deploying via the Wrangler CLI? See [Cloudflare Workers](/deploy/cloudfla
 
 <a id="deploy-with-wrangler" />
 <a id="deploy-on-every-push" />
-<a id="check-the-deployment" />
-<a id="run-your-first-remote-hit" />
+
+## Deploy and set a token
 
 <Steps>
     <Step title="Enable R2 and deploy the Worker">
@@ -27,7 +27,7 @@ Prefer deploying via the Wrangler CLI? See [Cloudflare Workers](/deploy/cloudfla
             />
         </a>
 
-        Sign in, connect GitHub or GitLab, and keep the pre-filled build and deploy commands (`pnpm run build` and `pnpm run deploy`). The first deployment provisions the Worker, an R2 bucket (`turborepo-cache`), and a D1 database (`turborepo-cache-stats`) for the dashboard. Copy the resulting `*.workers.dev` URL once the deploy finishes.
+        Sign in, connect GitHub or GitLab, and keep the pre-filled build and deploy commands (`pnpm run build` and `pnpm run deploy`). The first deployment provisions the Worker, an R2 bucket (`turborepo-cache`), and a D1 database (`turborepo-cache-stats`) for the dashboard. Copy your `*.workers.dev` URL once the deploy finishes.
     </Step>
     <Step title="Set TURBO_TOKEN">
         Generate a random bearer token:
@@ -38,13 +38,22 @@ Prefer deploying via the Wrangler CLI? See [Cloudflare Workers](/deploy/cloudfla
 
         In your Worker's **Settings** > **Variables and Secrets**, add a secret named `TURBO_TOKEN` with that value. Treat it like a password: anyone holding it can read and write artifacts across all teams on this deployment.
     </Step>
+
+</Steps>
+
+<a id="check-the-deployment" />
+<a id="run-your-first-remote-hit" />
+
+## Connect and verify
+
+<Steps>
     <Step title="Point Turborepo at your Worker">
-        Add the Worker's origin (no trailing slash, no `/v8`) and a team slug to your repository's root `turbo.json`:
+        Add your Worker's origin (no trailing slash, no `/v8`) and a team slug to your repository's root `turbo.json`:
 
         ```json turbo.json
         {
             "remoteCache": {
-                "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+                "apiUrl": "https://<your-worker>.workers.dev",
                 "teamSlug": "my-team"
             }
         }

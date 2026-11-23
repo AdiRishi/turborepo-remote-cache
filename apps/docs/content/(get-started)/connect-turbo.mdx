@@ -3,14 +3,15 @@ title: Connect Turborepo
 description: Configure your repository, developer machines, and CI pipelines to share a remote cache.
 ---
 
-Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and team slug shares one remote cache. Commit the non-secret URL and team in `turbo.json`, and distribute only `TURBO_TOKEN` through environment variables or a secret manager.
+Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and team slug shares one remote cache. Commit the non-secret URL and team in `turbo.json`, and distribute `TURBO_TOKEN` through environment variables or your secret manager.
+
+## Generate your config
+
+Enter your server origin and team slug below to generate ready-to-paste `turbo.json`, local shell, CI, and verification snippets:
 
 <ConfigBuilder />
 
-<Prompt
-    description="Ask your coding agent to configure remote caching and CI secrets in this repository."
-    actions={['copy', 'cursor']}
->
+<Prompt description="Configure remote caching with your coding agent" actions={['copy', 'cursor']}>
     Configure Turborepo remote caching in this repository: 1. Add `"remoteCache"` with `"apiUrl"`
     and `"teamSlug"` to the root `turbo.json` (ask me for my deployment URL and team slug if not
     provided). 2. Pass `TURBO_TOKEN` from CI secrets into every workflow job that runs `turbo`. 3.
@@ -20,28 +21,11 @@ Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and t
 <a id="turbojson" />
 <a id="choose-where-to-set-them" />
 
-## Configure `turbo.json`
+## Rules and client options
 
-Add `remoteCache` to your repository's root `turbo.json`:
-
-```json turbo.json
-{
-    "remoteCache": {
-        "apiUrl": "https://cache.example.com", // [!code highlight]
-        "teamSlug": "my-team" // [!code highlight]
-    }
-}
-```
-
-Use your server's bare HTTPS origin with no trailing slash and no `/v8` suffix. `teamSlug` can be any identifier you want; machines sharing artifacts just need to agree on the same value. Keep in mind that teams separate artifact namespaces rather than permissions (see [Security model and trade-offs](/introduction#one-token-opens-every-team)).
-
-Commit `turbo.json`, then export `TURBO_TOKEN` in each developer's shell profile (or load it via direnv or your secret manager):
-
-```sh
-export TURBO_TOKEN='<your-token>'
-```
-
-Never commit `TURBO_TOKEN` to Git. Note that `TURBO_API` and `TURBO_TEAM` environment variables override `turbo.json`, so unset any stale values if `turbo` talks to the wrong host.
+- **Use the bare HTTPS origin:** Set `remoteCache.apiUrl` without a trailing slash or `/v8` suffix (for example, `https://cache.example.com`).
+- **Agree on a team slug:** `teamSlug` can be any name shared by machines that should hit the same artifacts. Teams separate namespaces, not permissions (see [Security model and trade-offs](/introduction#one-token-opens-every-team)).
+- **Keep tokens out of Git:** Export `TURBO_TOKEN` in shell profiles, direnv, or your secret manager. Environment variables (`TURBO_API`, `TURBO_TEAM`) override `turbo.json`, so clear stale values if `turbo` targets the wrong server.
 
 <a id="turbo-login---manual" />
 
@@ -55,64 +39,23 @@ npm exec -- turbo login --manual
 
 When prompted:
 
-1. **Remote Cache URL:** Enter your server's origin (e.g. `https://cache.example.com`).
+1. **Remote Cache URL:** Enter your server's origin (`https://cache.example.com`).
 2. **How do you want to specify your team?** Pick **slug** and enter your team name (use **id** only for IDs prefixed with `team_`).
 3. **Enter token:** Paste your `TURBO_TOKEN`.
 
-Turborepo validates the token against your server, writes the token to your local user config, and updates `turbo.json` with the URL and team.
-
-For all configuration sources and precedence rules, see [Client configuration](/client-configuration).
+Turborepo validates the token against your server, writes it to your user config, and updates `turbo.json`. For every configuration source and precedence rule, see [Client configuration](/client-configuration).
 
 ## Configure CI
 
-Store `TURBO_TOKEN` as a secret in your CI provider and expose it to any step that invokes `turbo`. Because `apiUrl` and `teamSlug` live in `turbo.json`, CI jobs only need the token (if you didn't commit `remoteCache` in `turbo.json`, pass `TURBO_API` and `TURBO_TEAM` as well).
+Because `apiUrl` and `teamSlug` live in `turbo.json`, CI jobs only need `TURBO_TOKEN` (if you didn't commit `remoteCache`, pass `TURBO_API` and `TURBO_TEAM` too):
 
-<Tabs>
-<Tab title="GitHub Actions">
-
-Create a repository secret named `TURBO_TOKEN` under **Settings** > **Secrets and variables** > **Actions** and pass it into your workflow:
-
-```yaml .github/workflows/ci.yml
-jobs:
-    build:
-        runs-on: ubuntu-latest
-        env:
-            TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }} # [!code highlight]
-        steps:
-            - uses: actions/checkout@v7
-            # Install Node.js and dependencies here
-            - run: npm exec -- turbo run build
-```
-
-</Tab>
-<Tab title="GitLab CI">
-
-Add a masked `TURBO_TOKEN` variable under **Settings** > **CI/CD** > **Variables**. GitLab injects project variables into jobs automatically:
-
-```yaml .gitlab-ci.yml
-build:
-    image: node:24
-    script:
-        # Install dependencies here
-        - npm exec -- turbo run build
-```
-
-</Tab>
-<Tab title="Other CI">
-
-Expose `TURBO_TOKEN` from your CI provider's secret store before calling `turbo`:
-
-```sh
-export TURBO_TOKEN="$CACHE_TOKEN_SECRET"
-npm exec -- turbo run build
-```
-
-</Tab>
-</Tabs>
+- **GitHub Actions:** Add a repository secret named `TURBO_TOKEN` under **Settings** > **Secrets and variables** > **Actions** and expose it in your job's `env:` block (select **GitHub Actions** in the generator above for the workflow snippet).
+- **GitLab CI:** Add a masked `TURBO_TOKEN` variable under **Settings** > **CI/CD** > **Variables**. GitLab injects project variables into jobs automatically.
+- **Other CI:** Export `TURBO_TOKEN` from your provider's secret store before calling `turbo`.
 
 ## Check that hits come from the server
 
-Test connectivity and storage wiring right from your browser, then confirm an end-to-end `turbo` cache replay:
+Run a quick browser check against your live deployment, then verify an end-to-end `turbo` cache replay:
 
 <ConnectionTester />
 

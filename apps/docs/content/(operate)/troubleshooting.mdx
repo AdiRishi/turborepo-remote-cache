@@ -21,7 +21,9 @@ You can also test reachability and authentication from your terminal (assuming `
 
 ```sh
 curl --fail-with-body "$CACHE_URL/ping"
-curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
+curl --fail-with-body \
+  -H "Authorization: Bearer $TURBO_TOKEN" \
+  "$CACHE_URL/v8/artifacts/status"
 ```
 
 Expect `pong` followed by `{"status":"enabled"}`.

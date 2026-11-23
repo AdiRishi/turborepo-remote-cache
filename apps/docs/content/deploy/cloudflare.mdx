@@ -51,7 +51,7 @@ On first deploy, Cloudflare creates the R2 bucket near the runner executing the 
     <Step title="Add TURBO_TOKEN">
         In the Cloudflare dashboard, open **Workers & Pages** > **turborepo-remote-cache** > **Settings** > **Variables and Secrets**, and add a secret named `TURBO_TOKEN` with your generated token.
 
-        Copy your Worker's URL (e.g. `https://turborepo-remote-cache.<your-subdomain>.workers.dev`).
+        Copy your Worker's URL (e.g. `https://<your-worker>.workers.dev`).
     </Step>
 
 </Steps>
@@ -101,11 +101,13 @@ Requires [Node.js](https://nodejs.org) 24+ and the [pnpm](https://pnpm.io/instal
 Verify both the unauthenticated health check and authenticated status endpoint:
 
 ```sh
-CACHE_URL='https://turborepo-remote-cache.<your-subdomain>.workers.dev'
+CACHE_URL='https://<your-worker>.workers.dev'
 export TURBO_TOKEN='<your-token>'
 
 curl --fail-with-body "$CACHE_URL/ping"
-curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/artifacts/status"
+curl --fail-with-body \
+  -H "Authorization: Bearer $TURBO_TOKEN" \
+  "$CACHE_URL/v8/artifacts/status"
 ```
 
 `/ping` should return `pong`, and `/v8/artifacts/status` should return `{"status":"enabled"}`. A `401` indicates a token mismatch; for anything else, see [`turbo` cannot connect](/troubleshooting#turbo-cannot-connect).

@@ -7,10 +7,7 @@ When artifact signing is enabled, `turbo` signs every uploaded artifact with a s
 
 This separates **access control** from **build trust**: `TURBO_TOKEN` authorizes HTTP requests to the server, while `TURBO_REMOTE_CACHE_SIGNATURE_KEY` proves an artifact came from a trusted machine. Even if `TURBO_TOKEN` is compromised, an attacker cannot inject forged build outputs into developer laptops or CI.
 
-<Prompt
-    description="Ask your coding agent to enable artifact signing in turbo.json and CI workflows."
-    actions={['copy', 'cursor']}
->
+<Prompt description="Enable artifact signing with your coding agent" actions={['copy', 'cursor']}>
     Enable Turborepo remote cache artifact signing in this repository: 1. Add `"signature": true`
     under `"remoteCache"` in the root `turbo.json`. 2. Pass `TURBO_REMOTE_CACHE_SIGNATURE_KEY` from
     CI secrets alongside `TURBO_TOKEN` in every workflow job that runs `turbo`. 3. Do not commit any
@@ -24,23 +21,15 @@ This separates **access control** from **build trust**: `TURBO_TOKEN` authorizes
     <Step title="Enable signature verification in turbo.json">
         Add `"signature": true` under `remoteCache` in your root `turbo.json`:
 
-        <Diff
-            lang="json"
-            old={`{
-
-"remoteCache": {
-"apiUrl": "https://cache.example.com",
-"teamSlug": "my-team"
-}
-}`}
-            new={`{
-"remoteCache": {
-"apiUrl": "https://cache.example.com",
-"teamSlug": "my-team",
-"signature": true
-}
-}`}
-        />
+        ```json turbo.json
+        {
+            "remoteCache": {
+                "apiUrl": "https://cache.example.com",
+                "teamSlug": "my-team",
+                "signature": true // [!code ++]
+            }
+        }
+        ```
     </Step>
     <Step title="Generate a signing key">
         Generate a separate 32-byte key (never reuse `TURBO_TOKEN`) and save it in your team's secret manager:

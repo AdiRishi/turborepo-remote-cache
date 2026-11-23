@@ -174,6 +174,11 @@ function AdvisorResults({ size, style }: { size: ArtifactSizeTier; style: Hostin
             <StorageCard key={storage.id} storage={storage} size={size} style={style} />
           ))}
         </div>
+        <p className="rounded-md border border-dashed border-border bg-background/60 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+          Most monorepo builds exceed 4.5 MB. Start with{' '}
+          <strong className="font-medium text-foreground">Cloudflare Workers + R2</strong> unless
+          you already run containers or need artifacts over 100 MB.
+        </p>
       </div>
     </div>
   );

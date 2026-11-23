@@ -27,7 +27,7 @@ Share build outputs across CI, teammates, and coding agents without a Vercel acc
 - **Drop-in v8 API** Implements the official Turborepo Remote Cache specification natively. Set `remoteCache.apiUrl` in `turbo.json` and export `TURBO_TOKEN`. No Vercel account or `turbo login` required.
 - **Zero egress on Cloudflare R2** Cloudflare's free tier covers 100,000 Workers requests a day and 10 GB of R2 storage. Because R2 charges nothing for egress, heavy CI downloads never run up bandwidth bills.
 - **End-to-end artifact signing** Stores and returns `x-artifact-tag` headers untouched so `turbo` verifies HMAC-SHA256 signatures locally. Your signing key never leaves your machines.
-- **Portable runtime and storage** Built on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). Run on Cloudflare Workers, Node.js, Bun, Deno, Vercel, Netlify, or AWS Lambda with R2, KV, S3, or a custom adapter.
+- **Portable runtime and storage** Built on [Nitro](https://nitro.build) and [Files SDK](https://files-sdk.dev). Move between Cloudflare, containers, or serverless functions and any S3-compatible bucket without changing your Turborepo config.
 
 </HomeSection>
 
@@ -62,7 +62,7 @@ Every deployment ships with a live dashboard at `/`. Track build time saved, loc
         ```json turbo.json
         {
             "remoteCache": {
-                "apiUrl": "https://turborepo-remote-cache.<your-subdomain>.workers.dev",
+                "apiUrl": "https://<your-worker>.workers.dev",
                 "teamSlug": "my-team"
             }
         }

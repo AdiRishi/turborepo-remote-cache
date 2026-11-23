@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 
+/** True after client hydration, for browser-only components (e.g. charts or CSS.escape). */
+export const useMounted = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  return mounted;
+};
+
 /** True once the element behind `ref` has been on screen, so an animation can wait for someone to watch. */
 export const useSeen = <T extends Element>() => {
   const ref = useRef<T>(null);
@@ -16,7 +25,7 @@ export const useSeen = <T extends Element>() => {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 },
+      { threshold: 0.05 },
     );
     observer.observe(element);
     return () => {

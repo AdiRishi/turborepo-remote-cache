@@ -9,117 +9,85 @@ On Cloudflare Workers, configuration comes from Worker bindings, `vars`, and sec
 
 ## Core variables
 
-<TypeTable
-    type={{
-        TURBO_TOKEN: {
-            type: 'string',
-            required: true,
-            description:
-                'Non-empty bearer token required on /v8/* and /internal/* (compared in constant time via SHA-256).',
-        },
-        BUCKET_OBJECT_EXPIRATION_HOURS: {
-            type: 'integer (>= 1)',
-            default: '720',
-            description:
-                'Artifact retention window in whole hours. Also sets the write-time TTL for Workers KV. See Retention and expiry.',
-        },
-    }}
-/>
+<ResponseField name="TURBO_TOKEN" type="string" required>
+    Non-empty bearer token required on `/v8/*` and `/internal/*` (compared in constant time via
+    SHA-256).
+</ResponseField>
+
+<ResponseField name="BUCKET_OBJECT_EXPIRATION_HOURS" type="integer (>= 1)" default="720">
+    Artifact retention window in whole hours. Also sets the write-time TTL for Workers KV. See
+    [Retention and expiry](/retention).
+</ResponseField>
 
 ## Cloudflare bindings
 
 Available only on Cloudflare Workers (`apps/api/wrangler.jsonc`):
 
-<TypeTable
-    type={{
-        KV_STORE: {
-            type: 'KVNamespace',
-            description: 'Stores artifacts in Workers KV. Overrides R2_STORE when both are bound.',
-        },
-        R2_STORE: {
-            type: 'R2Bucket',
-            description: 'Stores artifacts in Cloudflare R2 (default Cloudflare backend).',
-        },
-        STATS_DB: {
-            type: 'D1Database',
-            description: 'Stores analytics for the built-in dashboard. Optional.',
-        },
-    }}
-/>
+<ResponseField name="KV_STORE" type="KVNamespace">
+    Stores artifacts in [Workers KV](/storage/kv). Overrides `R2_STORE` when both are bound.
+</ResponseField>
+
+<ResponseField name="R2_STORE" type="R2Bucket">
+    Stores artifacts in [Cloudflare R2](/storage/r2) (default Cloudflare backend).
+</ResponseField>
+
+<ResponseField name="STATS_DB" type="D1Database">
+    Stores analytics for the built-in [dashboard](/dashboard). Optional.
+</ResponseField>
 
 ## S3 variables
 
 Setting `S3_BUCKET` enables [S3-compatible storage](/storage/s3) when no custom adapter and no Cloudflare storage binding (`KV_STORE` / `R2_STORE`) is configured.
 
-<TypeTable
-    type={{
-        S3_BUCKET: {
-            type: 'string',
-            required: true,
-            description: 'Non-empty bucket name (required when using S3 storage).',
-        },
-        S3_ENDPOINT: {
-            type: 'string (URL)',
-            required: true,
-            description:
-                'S3 API endpoint URL, such as https://s3.us-east-1.amazonaws.com. Only the origin is used.',
-        },
-        S3_REGION: {
-            type: 'string',
-            default: 'AWS_REGION → AWS_DEFAULT_REGION → us-east-1',
-            description: 'Signing region. Set to auto for Cloudflare R2.',
-        },
-        S3_ACCESS_KEY_ID: {
-            type: 'string',
-            default: 'AWS_ACCESS_KEY_ID',
-            description: 'Access key ID.',
-        },
-        S3_SECRET_ACCESS_KEY: {
-            type: 'string',
-            default: 'AWS_SECRET_ACCESS_KEY',
-            description: 'Secret access key.',
-        },
-        S3_SESSION_TOKEN: {
-            type: 'string',
-            default: 'AWS_SESSION_TOKEN (with AWS_* keys)',
-            description: 'Temporary session token for IAM execution roles.',
-        },
-        S3_FORCE_PATH_STYLE: {
-            type: '"true" | "false"',
-            default: '"false"',
-            description:
-                'Set "true" to address <endpoint>/<bucket> instead of <bucket>.<endpoint> (required by MinIO and most self-hosted S3 stores).',
-        },
-    }}
-/>
+<ResponseField name="S3_BUCKET" type="string" required>
+    Non-empty bucket name (required when using S3 storage).
+</ResponseField>
+
+<ResponseField name="S3_ENDPOINT" type="string (URL)" required>
+    S3 API endpoint URL, such as `https://s3.us-east-1.amazonaws.com`. Only the origin is used.
+</ResponseField>
+
+<ResponseField name="S3_REGION" type="string" default="AWS_REGION → AWS_DEFAULT_REGION → us-east-1">
+    Signing region. Set to `auto` for Cloudflare R2.
+</ResponseField>
+
+<ResponseField name="S3_ACCESS_KEY_ID" type="string" default="AWS_ACCESS_KEY_ID">
+    Access key ID for bucket authentication.
+</ResponseField>
+
+<ResponseField name="S3_SECRET_ACCESS_KEY" type="string" default="AWS_SECRET_ACCESS_KEY">
+    Secret access key for bucket authentication.
+</ResponseField>
+
+<ResponseField name="S3_SESSION_TOKEN" type="string" default="AWS_SESSION_TOKEN">
+    Temporary session token for IAM execution roles (inherited when credentials come from `AWS_*`).
+</ResponseField>
+
+<ResponseField name="S3_FORCE_PATH_STYLE" type='"true" | "false"' default="false">
+    Set `true` to address `<endpoint>/<bucket>` instead of `<bucket>.<endpoint>` (required by MinIO
+    and most self-hosted S3 stores).
+</ResponseField>
 
 `AWS_*` fallbacks are read strictly from the process environment; `~/.aws` profiles and SSO sessions are not loaded.
 
 ## Build and platform variables
 
-<TypeTable
-    type={{
-        NITRO_PRESET: {
-            type: 'string',
-            default: '"cloudflare_module"',
-            description:
-                'Build-time Nitro target (e.g. node_server, bun, deno_server, vercel, netlify, aws_lambda).',
-        },
-        PORT: {
-            type: 'number',
-            default: '3000',
-            description: 'HTTP listening port on Node.js, Bun, and Deno.',
-        },
-        HOST: {
-            type: 'string',
-            description: 'Network interface / host address to bind on Node.js, Bun, and Deno.',
-        },
-        CRON_SECRET: {
-            type: 'string',
-            description: 'Bearer secret verified on Vercel Cron requests to /_vercel/cron.',
-        },
-    }}
-/>
+<ResponseField name="NITRO_PRESET" type="string" default="cloudflare_module">
+    Build-time Nitro target (such as `node_server`, `bun`, `deno_server`, `vercel`, `netlify`, or
+    `aws_lambda`). See [Platforms](/deploy).
+</ResponseField>
+
+<ResponseField name="PORT" type="number" default="3000">
+    HTTP listening port on Node.js, Bun, and Deno.
+</ResponseField>
+
+<ResponseField name="HOST" type="string">
+    Network interface or host address to bind on Node.js, Bun, and Deno.
+</ResponseField>
+
+<ResponseField name="CRON_SECRET" type="string">
+    Bearer secret verified on Vercel Cron requests to `/_vercel/cron`. See [Vercel](/deploy/vercel).
+</ResponseField>
 
 A [custom storage adapter](/storage/custom-adapter) can read any additional variables you define.
 

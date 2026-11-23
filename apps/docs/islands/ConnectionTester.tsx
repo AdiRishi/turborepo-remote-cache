@@ -62,7 +62,7 @@ function ProbeRow({ result }: { result: ProbeResult }) {
 
 function OriginFields({ url, team, onUrl, onTeam }: OriginFieldsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <label className="block space-y-1">
         <span className="text-xs font-medium text-muted-foreground">Server origin</span>
         <input

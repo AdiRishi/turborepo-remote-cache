@@ -74,8 +74,23 @@ pre {
 /* The homepage renders the dashboard's components, so its classes and colour tokens come along. */
 @source "../dashboard/src";
 
+/* Keep Blume's prose underline styles from leaking into custom interactive islands. */
+.prose .not-prose a {
+    text-decoration: none;
+}
+
+/* Allow Blume's Prompt banner to wrap cleanly on narrow mobile viewports. */
+:has(> [data-blume-prompt-description]) {
+    flex-wrap: wrap;
+}
+
+/* Give medium-length diff/config blocks room to show all lines without silent vertical cropping. */
+.prose pre > code {
+    max-height: 36rem;
+}
+
 /* The site's Tailwind reads its neutral colours from Blume's variables. Inside a dashboard they follow the
-   dashboard's palette, so a dashboard that is always dark stays dark on a light page. */
+   dashboard's palette, so both the theme-adaptive homepage preview and dark-only LiveCache render accurately. */
 [data-dashboard] {
     --blume-background: var(--background);
     --blume-foreground: var(--foreground);

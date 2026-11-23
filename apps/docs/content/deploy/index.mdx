@@ -7,35 +7,30 @@ Because the server is a [Nitro](https://nitro.build) application, the same codeb
 
 **Cloudflare Workers is the recommended default.** It's the only target that provisions artifact storage (R2), scheduled expiry, and a stats database (D1) automatically, and it's the target tested end-to-end against the real `turbo` CLI in CI.
 
+## Platform and storage advisor
+
 <StackAdvisor />
 
 ## Feature matrix
 
-| Platform                                 | Artifact storage                        | Scheduled expiry     | Stats database                              |
-| ---------------------------------------- | --------------------------------------- | -------------------- | ------------------------------------------- |
-| [Cloudflare Workers](/deploy/cloudflare) | R2 (default), KV, S3, or custom adapter | Built-in cron        | D1 (auto-created on first deploy)           |
-| [Node.js, Bun, and Deno](/deploy/node)   | S3 or custom adapter                    | In-process scheduler | SQLite on Node.js & Deno; configure for Bun |
-| [Vercel](/deploy/vercel)                 | S3 or custom adapter                    | Vercel Cron Jobs     | External hosted DB required                 |
-| [Netlify](/deploy/netlify)               | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
-| [AWS Lambda](/deploy/aws-lambda)         | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
+| Platform                                 | Max upload payload       | Artifact storage                        | Scheduled expiry     | Stats database                              |
+| ---------------------------------------- | ------------------------ | --------------------------------------- | -------------------- | ------------------------------------------- |
+| [Cloudflare Workers](/deploy/cloudflare) | 100 MB (200 MB Business) | R2 (default), KV, S3, or custom adapter | Built-in cron        | D1 (auto-created on first deploy)           |
+| [Node.js, Bun, and Deno](/deploy/node)   | Unlimited                | S3 or custom adapter                    | In-process scheduler | SQLite on Node.js & Deno; configure for Bun |
+| [Vercel](/deploy/vercel)                 | 4.5 MB                   | S3 or custom adapter                    | Vercel Cron Jobs     | External hosted DB required                 |
+| [Netlify](/deploy/netlify)               | ~4.5 MB                  | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
+| [AWS Lambda](/deploy/aws-lambda)         | Under 6 MB (Base64)      | S3 or custom adapter                    | External scheduler   | External hosted DB required                 |
 
 On platforms without built-in scheduling, trigger `POST /internal/delete-expired-objects` daily from an external cron (see [Run expiry from a scheduler](/retention#run-expiry-from-a-scheduler)). For database options on non-Cloudflare hosts, see [Stats database](/stats-database).
 
 ## Artifact size limits
 
-If a build output exceeds your host's HTTP payload cap, `turbo` cannot upload it and that task will miss on every remote build:
+If a build output exceeds your host's HTTP payload cap, `turbo` cannot upload it and that task will miss on every remote build. Modern monorepo outputs (Next.js `.next` builds, Rust/Wasm artifacts, large TypeScript bundles) routinely exceed 4.5 MB, so pick **Cloudflare Workers** or a **Node.js / Bun / Deno** process unless you know your outputs stay small.
 
-| Platform               | Max upload payload                                                                                                                                                                      |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cloudflare Workers     | 100 MB (Free & Pro zones), 200 MB (Business). Determined by zone plan, not Workers plan. [Docs](https://developers.cloudflare.com/workers/platform/limits/#request-and-response-limits) |
-| Node.js, Bun, and Deno | Unlimited (constrained only by any reverse proxy in front of the process).                                                                                                              |
-| Vercel                 | 4.5 MB. [Docs](https://vercel.com/docs/functions/limitations#request-body-size)                                                                                                         |
-| Netlify                | ~4.5 MB (6 MB envelope minus Base64 overhead). [Docs](https://docs.netlify.com/build/functions/configuration/)                                                                          |
-| AWS Lambda             | Under 6 MB (synchronous payload limit minus event envelope and Base64 overhead). [Docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)                        |
-
-Modern monorepo build artifacts (Next.js `.next` bundles, Rust/Wasm outputs, large TypeScript builds) routinely cross 4.5 MB. Choose **Cloudflare Workers** or a **Node.js / Bun / Deno** server unless you know your artifacts stay small.
-
-Storage backends can impose tighter limits than the host: Workers KV caps values at 25 MiB, and the S3 adapter buffers uploads in memory, so very large uploads require sufficient runtime RAM.
+- **Cloudflare Workers:** 100 MB on Free and Pro zones, 200 MB on Business (governed by your Cloudflare zone plan, not Workers plan). [Limits](https://developers.cloudflare.com/workers/platform/limits/#request-and-response-limits)
+- **Node.js, Bun, and Deno:** No server-side cap (constrained only by any reverse proxy in front of the process).
+- **Vercel / Netlify / AWS Lambda:** Hard serverless body limits of [4.5 MB on Vercel](https://vercel.com/docs/functions/limitations#request-body-size), [~4.5 MB on Netlify](https://docs.netlify.com/build/functions/configuration/) (6 MB buffered minus Base64 overhead), and [under 6 MB on Lambda](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html) (event envelope + Base64 overhead).
+- **Storage limits:** Workers KV caps values at 25 MiB, and the S3 adapter buffers uploads in memory, so very large uploads require sufficient runtime RAM.
 
 ## Build from source
 

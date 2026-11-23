@@ -1,6 +1,19 @@
 export type CiProvider = 'github' | 'gitlab' | 'shell';
 export type OutputTab = 'turbo' | 'local' | 'ci' | 'verify';
 
+export const OUTPUT_TABS: readonly { id: OutputTab; label: string }[] = [
+  { id: 'turbo', label: 'turbo.json' },
+  { id: 'local', label: 'Local shell' },
+  { id: 'ci', label: 'CI workflow' },
+  { id: 'verify', label: 'Verify (curl)' },
+];
+
+export const CI_PROVIDERS: readonly { id: CiProvider; label: string }[] = [
+  { id: 'github', label: 'GitHub Actions' },
+  { id: 'gitlab', label: 'GitLab CI' },
+  { id: 'shell', label: 'Other CI' },
+];
+
 export interface ConfigBuilderInput {
   apiUrl: string;
   teamSlug: string;

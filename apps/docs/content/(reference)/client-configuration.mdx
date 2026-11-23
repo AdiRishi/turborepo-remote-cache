@@ -3,39 +3,34 @@ title: Client configuration
 description: Reference of environment variables, turbo.json keys, and precedence rules for connecting Turborepo to your server.
 ---
 
-Turborepo reads remote cache settings from environment variables, config files, and CLI flags:
+Turborepo reads remote cache settings from environment variables, config files, and CLI flags.
 
-<TypeTable
-    type={{
-        'TURBO_API / remoteCache.apiUrl': {
-            type: 'string (URL)',
-            required: true,
-            description:
-                'Bare server origin (e.g. https://cache.example.com), without a trailing slash or /v8.',
-        },
-        TURBO_TOKEN: {
-            type: 'string',
-            required: true,
-            description:
-                'Shared bearer token matching the server TURBO_TOKEN secret. Environment / user config only (never commit in turbo.json).',
-        },
-        'TURBO_TEAM / remoteCache.teamSlug': {
-            type: 'string',
-            description:
-                'Artifact namespace shared across participating machines. Use either teamSlug or teamId.',
-        },
-        'TURBO_TEAMID / remoteCache.teamId': {
-            type: 'string',
-            description:
-                'Alternative namespace identifier; turbo expects team IDs prefixed with team_.',
-        },
-        TURBO_REMOTE_CACHE_SIGNATURE_KEY: {
-            type: 'string',
-            description:
-                'Shared HMAC-SHA256 signing key (32+ bytes recommended) required when remoteCache.signature is true.',
-        },
-    }}
-/>
+## Variables and keys
+
+<ResponseField name="TURBO_API" type="string (URL)" required>
+    Bare server origin (such as `https://cache.example.com`), without a trailing slash or `/v8`.
+    Also configurable as `remoteCache.apiUrl` in `turbo.json`.
+</ResponseField>
+
+<ResponseField name="TURBO_TOKEN" type="string" required>
+    Shared bearer token matching the server's `TURBO_TOKEN` secret. Set via environment variables or
+    user config—never commit it in `turbo.json`.
+</ResponseField>
+
+<ResponseField name="TURBO_TEAM" type="string">
+    Artifact namespace shared across participating machines. Also configurable as
+    `remoteCache.teamSlug` in `turbo.json`; provide either `teamSlug` or `teamId`.
+</ResponseField>
+
+<ResponseField name="TURBO_TEAMID" type="string">
+    Alternative namespace identifier (`turbo` expects team IDs prefixed with `team_`). Also
+    configurable as `remoteCache.teamId` in `turbo.json`.
+</ResponseField>
+
+<ResponseField name="TURBO_REMOTE_CACHE_SIGNATURE_KEY" type="string">
+    Shared HMAC-SHA256 signing key (32+ bytes recommended) required when `remoteCache.signature` is
+    `true` in `turbo.json`. See [Artifact signing](/sign-artifacts).
+</ResponseField>
 
 ## Precedence order
 

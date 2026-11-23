@@ -2,22 +2,15 @@ import { useState } from 'react';
 
 import type { CiProvider, ConfigBuilderInput, OutputTab } from '../lib/config-builder';
 
-import { buildOutput, outputFilename, randomHex32 } from '../lib/config-builder';
+import {
+  buildOutput,
+  CI_PROVIDERS,
+  OUTPUT_TABS,
+  outputFilename,
+  randomHex32,
+} from '../lib/config-builder';
 
 export const client = 'visible';
-
-const TABS: readonly { id: OutputTab; label: string }[] = [
-  { id: 'turbo', label: 'turbo.json' },
-  { id: 'local', label: 'Local shell' },
-  { id: 'ci', label: 'CI workflow' },
-  { id: 'verify', label: 'Verify (curl)' },
-];
-
-const CI_OPTIONS: readonly { id: CiProvider; label: string }[] = [
-  { id: 'github', label: 'GitHub Actions' },
-  { id: 'gitlab', label: 'GitLab CI' },
-  { id: 'shell', label: 'Other CI' },
-];
 
 const pillClass = (active: boolean) =>
   `cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
@@ -81,7 +74,7 @@ function SecretActions({ hasSecrets, signing, onGenerate, onClear }: SecretActio
 
 function TextInputs({ apiUrl, teamSlug, onApiUrl, onTeamSlug }: TextInputsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <label className="block space-y-1">
         <span className="text-xs font-medium text-muted-foreground">Server origin</span>
         <input
@@ -123,7 +116,7 @@ function OptionRow({ signing, ci, onSigning, onCi }: OptionRowProps) {
         Enable HMAC-SHA256 artifact signing
       </label>
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="CI provider">
-        {CI_OPTIONS.map((option) => (
+        {CI_PROVIDERS.map((option) => (
           <button
             key={option.id}
             type="button"
@@ -142,8 +135,12 @@ function OptionRow({ signing, ci, onSigning, onCi }: OptionRowProps) {
 
 function OutputTabs({ tab, onTab }: { tab: OutputTab; onTab: (value: OutputTab) => void }) {
   return (
-    <div className="flex flex-wrap gap-1" role="tablist" aria-label="Generated config">
-      {TABS.map((item) => (
+    <div
+      className="flex min-w-0 items-center gap-1 overflow-x-auto"
+      role="tablist"
+      aria-label="Generated config"
+    >
+      {OUTPUT_TABS.map((item) => (
         <button
           key={item.id}
           type="button"
@@ -152,7 +149,7 @@ function OutputTabs({ tab, onTab }: { tab: OutputTab; onTab: (value: OutputTab) 
           onClick={() => {
             onTab(item.id);
           }}
-          className={`cursor-pointer rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+          className={`shrink-0 cursor-pointer rounded px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
             tab === item.id
               ? 'bg-background text-foreground shadow-xs ring-1 ring-border'
               : 'text-muted-foreground hover:text-foreground'
@@ -168,9 +165,9 @@ function OutputTabs({ tab, onTab }: { tab: OutputTab; onTab: (value: OutputTab) 
 function OutputPane({ tab, filename, code, copied, onTab, onCopy }: OutputPaneProps) {
   return (
     <div className="overflow-hidden rounded-md border border-border bg-code">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/50 px-2 py-1.5">
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/50 px-2 py-1.5">
         <OutputTabs tab={tab} onTab={onTab} />
-        <div className="flex items-center gap-2 pr-1">
+        <div className="flex shrink-0 items-center gap-2 pr-1">
           <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
             {filename}
           </span>
@@ -183,9 +180,13 @@ function OutputPane({ tab, filename, code, copied, onTab, onCopy }: OutputPanePr
           </button>
         </div>
       </div>
-      <pre className="m-0 overflow-x-auto p-3.5 font-mono text-xs leading-relaxed text-foreground">
-        <code>{code}</code>
-      </pre>
+      <div
+        role="region"
+        aria-label={filename}
+        className="overflow-x-auto p-3.5 font-mono text-xs leading-relaxed text-foreground"
+      >
+        <code className="block whitespace-pre">{code}</code>
+      </div>
     </div>
   );
 }
@@ -221,13 +222,16 @@ const EMPTY_SECRETS = { token: '', signingKey: '' };
 function useBuilderState() {
   const [apiUrl, setApiUrl] = useState('https://turborepo-remote-cache.acme.workers.dev');
   const [teamSlug, setTeamSlug] = useState('my-team');
-  const [signing, setSigning] = useState(true);
+  const [signing, setSigning] = useState(false);
   const [ci, setCi] = useState<CiProvider>('github');
   const [secrets, setSecrets] = useState(EMPTY_SECRETS);
   const [tab, setTab] = useState<OutputTab>('turbo');
   const input: ConfigBuilderInput = { apiUrl, teamSlug, signing, ci, ...secrets };
   const generate = () => {
     setSecrets({ token: randomHex32(), signingKey: randomHex32() });
+    if (tab === 'turbo' || tab === 'ci') {
+      setTab('local');
+    }
   };
   const clear = () => {
     setSecrets(EMPTY_SECRETS);
