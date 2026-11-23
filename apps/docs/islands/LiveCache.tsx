@@ -23,7 +23,7 @@ import { useMemo } from 'react';
 import type { Line, Script } from '../lib/terminal';
 
 import { finished, hit, liveStats, SAVED_BEFORE_MS, upload } from '../lib/live-stats';
-import { usePlayback, useSeen } from '../lib/playback';
+import { useMounted, usePlayback, useSeen } from '../lib/playback';
 import {
   activePane,
   COMMAND,
@@ -183,9 +183,11 @@ const terminals = [
 ] as const;
 
 export default function LiveCache() {
+  const mounted = useMounted();
   const { ref, seen } = useSeen<HTMLElement>();
   const { elapsed } = usePlayback(LOOP, { playing: seen });
   const active = activePane(beats, elapsed, 'laptop');
+
   return (
     // From 42rem wide, the panes sit side by side: the figure keeps its 65rem layout and zooms to fit the
     // column. tan(atan2(a, b)) is a / b as a plain number, which zoom needs.
@@ -221,7 +223,7 @@ export default function LiveCache() {
             data-dashboard
             className="dark h-full [--background:#0e1013] [--blume-font-body:'Geist_Variable',ui-sans-serif,system-ui,sans-serif] [--blume-font-mono:'Geist_Mono_Variable',ui-monospace,monospace] font-sans text-[15px] leading-normal text-foreground"
           >
-            {seen ? <LiveDashboard elapsed={elapsed} /> : null}
+            {mounted ? <LiveDashboard elapsed={elapsed} /> : null}
           </div>
         </Frame>
       </figure>

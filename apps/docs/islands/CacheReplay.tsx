@@ -88,14 +88,26 @@ const HOLD_MS = 4500;
 const LOOP = lastBeat(beats) + HOLD_MS;
 
 const panes: { id: PaneId; title: string; detail: string; prompt?: string; className: string }[] = [
-  { id: 'laptop', title: 'laptop', detail: '~/acme', prompt: '~/acme $', className: 'h-[23.5rem]' },
+  {
+    id: 'laptop',
+    title: 'laptop',
+    detail: '~/acme',
+    prompt: '~/acme $',
+    className: 'h-[19rem] sm:h-[23.5rem]',
+  },
   {
     id: 'worker',
     title: 'worker',
     detail: 'wrangler tail',
     className: 'h-[10rem] lg:col-span-2 lg:row-start-2',
   },
-  { id: 'ci', title: 'ci', detail: 'github actions', prompt: 'runner $', className: 'h-[23.5rem]' },
+  {
+    id: 'ci',
+    title: 'ci',
+    detail: 'github actions',
+    prompt: 'runner $',
+    className: 'h-[19rem] sm:h-[23.5rem]',
+  },
 ];
 
 export default function CacheReplay() {
@@ -115,7 +127,7 @@ export default function CacheReplay() {
             title={pane.title}
             detail={pane.detail}
             active={pane.id === active}
-            className={`px-4 pt-7 pb-3 ${pane.className}`}
+            className={`px-3 pt-7 pb-3 sm:px-4 ${pane.className}`}
           >
             <Terminal script={script} pane={pane.id} prompt={pane.prompt} elapsed={elapsed} />
           </Frame>

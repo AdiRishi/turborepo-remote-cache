@@ -2,14 +2,15 @@ import { defineMeta } from 'blume';
 
 export default defineMeta({
   title: 'Operate',
+  icon: 'activity',
   order: 4,
   pages: [
-    'update',
-    'retention',
     'dashboard',
     'stats-database',
+    'retention',
     'observability',
-    'troubleshooting',
+    'update',
     'upgrade-from-v4',
+    'troubleshooting',
   ],
 });

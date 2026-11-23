@@ -1,0 +1,89 @@
+---
+const specs = [
+  { value: '100k / day', label: 'Workers free-tier requests' },
+  { value: '10 GB · $0 egress', label: 'R2 free storage, zero bandwidth fees' },
+  { value: '100 MB+', label: 'Max upload on Workers (unlimited on Node)' },
+  { value: '7 runtimes', label: 'Workers, Node, Bun, Deno, Vercel, Netlify, Lambda' },
+];
+---
+
+<section class="home-specs not-prose" aria-label="Key platform specifications">
+  <dl class="home-specs-grid">
+    {
+      specs.map((spec) => (
+        <div class="home-spec-item">
+          <dt class="home-spec-label">{spec.label}</dt>
+          <dd class="home-spec-value">{spec.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>
+
+<style>
+  .home-specs {
+    max-width: 72rem;
+    margin: 3.5rem auto 0;
+    border-top: 1px solid var(--blume-border);
+    border-bottom: 1px solid var(--blume-border);
+  }
+
+  .home-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  .home-spec-item {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    padding: 1.5rem 1.25rem;
+    border-bottom: 1px solid var(--blume-border);
+  }
+
+  .home-spec-item:nth-child(odd) {
+    border-right: 1px solid var(--blume-border);
+  }
+
+  .home-spec-item:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .home-spec-value {
+    margin: 0;
+    color: var(--blume-foreground);
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .home-spec-label {
+    margin: 0;
+    color: var(--blume-muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 56rem) {
+    .home-specs-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .home-spec-item {
+      border-bottom: 0;
+      border-right: 1px solid var(--blume-border);
+    }
+
+    .home-spec-item:first-child {
+      padding-left: 0;
+    }
+
+    .home-spec-item:last-child {
+      border-right: 0;
+      padding-right: 0;
+    }
+  }
+</style>

@@ -1,0 +1,203 @@
+---
+const platforms = [
+  {
+    name: 'Cloudflare Workers',
+    href: '/deploy/cloudflare',
+    badge: 'Default · 100 MB+',
+    accent: true,
+    detail: 'One-click deploy with R2 storage, cron expiry, and D1 analytics.',
+  },
+  {
+    name: 'Node.js, Bun, and Deno',
+    href: '/deploy/node',
+    badge: 'No upload cap',
+    accent: false,
+    detail: 'Self-contained server binary for Docker, VMs, or Kubernetes.',
+  },
+  {
+    name: 'Vercel',
+    href: '/deploy/vercel',
+    badge: '4.5 MB cap',
+    accent: false,
+    detail: 'Vercel Functions with S3 storage and built-in Vercel Cron Jobs.',
+  },
+  {
+    name: 'Netlify',
+    href: '/deploy/netlify',
+    badge: '~4.5 MB cap',
+    accent: false,
+    detail: 'Netlify Functions backed by any S3-compatible bucket.',
+  },
+  {
+    name: 'AWS Lambda',
+    href: '/deploy/aws-lambda',
+    badge: '< 6 MB cap',
+    accent: false,
+    detail: 'Lambda handler with IAM execution role authentication for S3.',
+  },
+];
+
+const backends = [
+  {
+    name: 'Cloudflare R2',
+    href: '/storage/r2',
+    badge: 'Default · $0 egress',
+    accent: true,
+    detail: 'Native Worker binding with no credentials to rotate or egress bills.',
+  },
+  {
+    name: 'S3-compatible buckets',
+    href: '/storage/s3',
+    badge: 'All platforms',
+    accent: false,
+    detail: 'AWS S3, R2 over S3 API, MinIO, Tigris, or any S3-compatible store.',
+  },
+  {
+    name: 'Cloudflare KV',
+    href: '/storage/kv',
+    badge: '25 MiB cap',
+    accent: false,
+    detail: 'Native Worker KV binding with automatic write-time TTL expiration.',
+  },
+  {
+    name: 'Custom Files SDK adapter',
+    href: '/storage/custom-adapter',
+    badge: 'Extensible',
+    accent: false,
+    detail: 'Plug in Google Cloud Storage, local disk, or any Files SDK adapter.',
+  },
+];
+---
+
+<div class="home-stack not-prose">
+  <div class="home-stack-group">
+    <h3 class="home-stack-heading">Platforms</h3>
+    <div class="home-stack-grid">
+      {
+        platforms.map((item) => (
+          <a href={item.href} class:list={['home-stack-card', { 'is-featured': item.accent }]}>
+            <div class="home-stack-card-head">
+              <span class="home-stack-card-title">{item.name}</span>
+              <span class:list={['home-stack-badge', { 'is-accent': item.accent }]}>
+                {item.badge}
+              </span>
+            </div>
+            <p class="home-stack-card-detail">{item.detail}</p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="home-stack-group">
+    <h3 class="home-stack-heading">Storage backends</h3>
+    <div class="home-stack-grid">
+      {
+        backends.map((item) => (
+          <a href={item.href} class="home-stack-card">
+            <div class="home-stack-card-head">
+              <span class="home-stack-card-title">{item.name}</span>
+              <span class:list={['home-stack-badge', { 'is-accent': item.accent }]}>
+                {item.badge}
+              </span>
+            </div>
+            <p class="home-stack-card-detail">{item.detail}</p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .home-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+    margin-top: 2rem;
+  }
+
+  .home-stack-heading {
+    margin: 0 0 0.875rem;
+    color: var(--blume-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .home-stack-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .home-stack-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-stack-card.is-featured {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .home-stack-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--blume-border);
+    border-radius: var(--blume-radius);
+    background: var(--blume-background);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 150ms,
+      background-color 150ms;
+  }
+
+  .home-stack-card:hover {
+    border-color: var(--blume-accent);
+    background: var(--blume-muted);
+  }
+
+  .home-stack-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .home-stack-card-title {
+    color: var(--blume-foreground);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .home-stack-badge {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--blume-border);
+    border-radius: 999px;
+    background: var(--blume-muted);
+    color: var(--blume-muted-foreground);
+    font-family: var(--blume-font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  .home-stack-badge.is-accent {
+    border-color: color-mix(in srgb, var(--blume-accent) 35%, transparent);
+    background: color-mix(in srgb, var(--blume-accent) 12%, transparent);
+    color: var(--blume-accent);
+  }
+
+  .home-stack-card-detail {
+    margin: 0;
+    color: var(--blume-muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+</style>
