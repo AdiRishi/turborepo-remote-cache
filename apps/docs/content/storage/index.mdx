@@ -21,10 +21,18 @@ Artifact storage is powered by [Files SDK](https://files-sdk.dev). The server sh
 
 On each request, the server selects the first configured backend in this precedence order:
 
-1. The adapter returned by `apps/api/src/custom-adapter.ts` (if non-`undefined`)
-2. The `KV_STORE` binding
-3. The `R2_STORE` binding
-4. The `S3_*` environment variables (when `S3_BUCKET` is set)
+```mermaid
+flowchart TD
+    A[Incoming cache request] --> B{"customAdapter(env) returns adapter?"}
+    B -- Yes --> B1[Custom Files SDK adapter]
+    B -- No --> C{"KV_STORE bound?"}
+    C -- Yes --> C1[Cloudflare KV]
+    C -- No --> D{"R2_STORE bound?"}
+    D -- Yes --> D1["Cloudflare R2 (default)"]
+    D -- No --> E{"S3_BUCKET set?"}
+    E -- Yes --> E1[S3-compatible bucket]
+    E -- No --> F["HTTP 500: Invalid server configuration"]
+```
 
 Notice that Cloudflare bindings always take precedence over `S3_*` variables. If you want a Worker to talk to an external S3 bucket instead of R2, remove the `r2_buckets` binding from `apps/api/wrangler.jsonc`.
 

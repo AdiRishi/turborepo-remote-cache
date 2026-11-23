@@ -18,7 +18,7 @@ On Cloudflare Workers, update `vars` in `apps/api/wrangler.jsonc` and redeploy:
 ```jsonc apps/api/wrangler.jsonc
 {
     "vars": {
-        "BUCKET_OBJECT_EXPIRATION_HOURS": 168,
+        "BUCKET_OBJECT_EXPIRATION_HOURS": 168, // [!code highlight]
     },
 }
 ```

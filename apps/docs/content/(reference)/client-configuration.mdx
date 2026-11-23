@@ -5,13 +5,37 @@ description: Reference of environment variables, turbo.json keys, and precedence
 
 Turborepo reads remote cache settings from environment variables, config files, and CLI flags:
 
-| Setting     | Environment variable               | `turbo.json` key       | Description                                                                             |
-| ----------- | ---------------------------------- | ---------------------- | --------------------------------------------------------------------------------------- |
-| Server URL  | `TURBO_API`                        | `remoteCache.apiUrl`   | Bare server origin (e.g. `https://cache.example.com`), without trailing slash or `/v8`. |
-| Token       | `TURBO_TOKEN`                      | —                      | Shared bearer token matching the server's `TURBO_TOKEN`.                                |
-| Team slug   | `TURBO_TEAM`                       | `remoteCache.teamSlug` | Artifact namespace shared across participating machines.                                |
-| Team ID     | `TURBO_TEAMID`                     | `remoteCache.teamId`   | Alternative namespace identifier; `turbo` expects IDs prefixed with `team_`.            |
-| Signing key | `TURBO_REMOTE_CACHE_SIGNATURE_KEY` | —                      | Shared HMAC-SHA256 key used when `remoteCache.signature` is `true`.                     |
+<TypeTable
+    type={{
+        'TURBO_API / remoteCache.apiUrl': {
+            type: 'string (URL)',
+            required: true,
+            description:
+                'Bare server origin (e.g. https://cache.example.com), without a trailing slash or /v8.',
+        },
+        TURBO_TOKEN: {
+            type: 'string',
+            required: true,
+            description:
+                'Shared bearer token matching the server TURBO_TOKEN secret. Environment / user config only (never commit in turbo.json).',
+        },
+        'TURBO_TEAM / remoteCache.teamSlug': {
+            type: 'string',
+            description:
+                'Artifact namespace shared across participating machines. Use either teamSlug or teamId.',
+        },
+        'TURBO_TEAMID / remoteCache.teamId': {
+            type: 'string',
+            description:
+                'Alternative namespace identifier; turbo expects team IDs prefixed with team_.',
+        },
+        TURBO_REMOTE_CACHE_SIGNATURE_KEY: {
+            type: 'string',
+            description:
+                'Shared HMAC-SHA256 signing key (32+ bytes recommended) required when remoteCache.signature is true.',
+        },
+    }}
+/>
 
 ## Precedence order
 
@@ -47,4 +71,4 @@ You can also store settings for a single local checkout in `.turbo/config.json`:
 }
 ```
 
-Ensure `.turbo` is listed in `.gitignore` so the token is never committed. For team-wide and CI setup, see [Connect Turborepo](/connect-turbo).
+Ensure `.turbo` is listed in `.gitignore` so the token is never committed. For team-wide and CI setup (including an interactive config generator), see [Connect Turborepo](/connect-turbo).

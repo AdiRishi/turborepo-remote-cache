@@ -23,8 +23,8 @@ Use `head_sampling_rate` (between `0` and `1`) in `apps/api/wrangler.jsonc` to s
 {
     "observability": {
         "enabled": true,
-        "logs": { "head_sampling_rate": 0.1 },
-        "traces": { "enabled": true, "head_sampling_rate": 0.05 },
+        "logs": { "head_sampling_rate": 0.1 }, // [!code highlight]
+        "traces": { "enabled": true, "head_sampling_rate": 0.05 }, // [!code highlight]
         "issues": { "enabled": true },
     },
 }

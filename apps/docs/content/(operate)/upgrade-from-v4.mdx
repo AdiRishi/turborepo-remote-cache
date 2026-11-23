@@ -19,14 +19,54 @@ Version 5 moves to a pnpm workspace with the server under `apps/api`:
 | `src/`                               | `apps/api/src/`                                |
 | `triggers.crons` in `wrangler.jsonc` | `scheduledTasks` in `apps/api/nitro.config.ts` |
 
-1. Port your custom settings (bucket name, KV namespace, retention hours, routes) into `apps/api/wrangler.jsonc`. Omit `triggers` (Nitro generates the cron trigger from `scheduledTasks` at build time) and drop `ENVIRONMENT`, which v5 no longer reads.
-2. Build and deploy from the repository root:
+Port your custom settings (bucket name, KV namespace, retention hours, routes) into `apps/api/wrangler.jsonc`. Omit `triggers` (Nitro generates the cron trigger from `scheduledTasks` at build time) and drop `ENVIRONMENT`, which v5 no longer reads:
 
-    ```sh
-    pnpm install
-    pnpm build
-    pnpm run deploy
-    ```
+<Diff
+    lang="jsonc"
+    old={`{
+  "name": "turborepo-remote-cache",
+  "vars": {
+    "ENVIRONMENT": "production",
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720
+  },
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2_STORE",
+      "bucket_name": "turborepo-cache"
+    }
+  ]
+}`}
+    new={`{
+  "name": "turborepo-remote-cache",
+  "vars": {
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2_STORE",
+      "bucket_name": "turborepo-cache",
+      "preview_bucket_name": "turborepo-cache-preview"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "STATS_DB",
+      "database_name": "turborepo-cache-stats"
+    }
+  ]
+}`}
+/>
+
+Then build and deploy from the repository root:
+
+```sh
+pnpm install
+pnpm build
+pnpm run deploy
+```
 
 If you deploy via Workers Builds, update the build directory to the repository root with build command `pnpm run build` and deploy command `pnpm run deploy`.
 

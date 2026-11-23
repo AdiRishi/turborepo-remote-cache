@@ -2,6 +2,7 @@ import { defineMeta } from 'blume';
 
 export default defineMeta({
   title: 'Operate',
+  icon: 'activity',
   order: 4,
   pages: [
     'dashboard',

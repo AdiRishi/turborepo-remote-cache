@@ -18,6 +18,8 @@ Share build outputs across CI, teammates, and coding agents without a Vercel acc
 
 <CacheReplay />
 
+<HomeSpecs />
+
 <HomeSection>
 
 ## Why self-host
@@ -72,7 +74,7 @@ Every deployment ships with a live dashboard at `/`. Track build time saved, loc
 
 </Steps>
 
-Follow the [Quickstart](/get-started) for a full walkthrough, [Connect Turborepo](/connect-turbo) for CI setup, or [Artifact signing](/sign-artifacts) to configure HMAC verification.
+Follow the [Quickstart](/get-started) for a full walkthrough, [Connect Turborepo](/connect-turbo) to generate your repo and CI config interactively, or [Artifact signing](/sign-artifacts) to configure HMAC verification.
 
 </HomeSection>
 
@@ -80,27 +82,8 @@ Follow the [Quickstart](/get-started) for a full walkthrough, [Connect Turborepo
 
 ## Runs on your stack
 
-Cloudflare Workers is the turnkey default with R2 storage, scheduled expiry, and D1 analytics wired up automatically. The same server builds for six other runtimes and any S3-compatible bucket. See [Platforms](/deploy) to compare payload size limits before choosing a serverless host.
+Cloudflare Workers is the turnkey default with R2 storage, scheduled expiry, and D1 analytics wired up automatically. The same server builds for six other runtimes and any S3-compatible bucket. Use the interactive [Platform advisor](/deploy) to match your artifact sizes to the right host.
 
-<Columns cols={2}>
-    <Column>
-        ### Platforms
-
-        - [Cloudflare Workers](/deploy/cloudflare)
-        - [Node.js, Bun, and Deno](/deploy/node)
-        - [Vercel](/deploy/vercel)
-        - [Netlify](/deploy/netlify)
-        - [AWS Lambda](/deploy/aws-lambda)
-    </Column>
-    <Column>
-        ### Storage
-
-        - [Cloudflare R2](/storage/r2)
-        - [Cloudflare KV](/storage/kv)
-        - [S3-compatible buckets](/storage/s3)
-        - [Custom Files SDK adapters](/storage/custom-adapter)
-    </Column>
-
-</Columns>
+<HomeStack />
 
 </HomeSection>

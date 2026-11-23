@@ -48,6 +48,10 @@ export default defineConfig({
       { label: 'API reference', path: '/api' },
     ],
     actions: [{ label: `v${apiPackage.version}`, href: changelogUrl }],
+    cta: { label: 'Get started', href: '/get-started' },
+  },
+  markdown: {
+    externalLinks: true,
   },
   reference: [
     openapi({

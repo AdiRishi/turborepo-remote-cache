@@ -3,7 +3,19 @@ title: Connect Turborepo
 description: Configure your repository, developer machines, and CI pipelines to share a remote cache.
 ---
 
-Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and team slug shares one remote cache. The cleanest setup commits the non-secret URL and team in `turbo.json` and distributes only `TURBO_TOKEN` through environment variables or a secret manager.
+Every laptop and CI runner that shares the same server URL, `TURBO_TOKEN`, and team slug shares one remote cache. Commit the non-secret URL and team in `turbo.json`, and distribute only `TURBO_TOKEN` through environment variables or a secret manager.
+
+<ConfigBuilder />
+
+<Prompt
+    description="Ask your coding agent to configure remote caching and CI secrets in this repository."
+    actions={['copy', 'cursor']}
+>
+    Configure Turborepo remote caching in this repository: 1. Add `"remoteCache"` with `"apiUrl"`
+    and `"teamSlug"` to the root `turbo.json` (ask me for my deployment URL and team slug if not
+    provided). 2. Pass `TURBO_TOKEN` from CI secrets into every workflow job that runs `turbo`. 3.
+    Make sure `.turbo` is in `.gitignore` and never commit `TURBO_TOKEN` to Git.
+</Prompt>
 
 <a id="turbojson" />
 <a id="choose-where-to-set-them" />
@@ -15,15 +27,15 @@ Add `remoteCache` to your repository's root `turbo.json`:
 ```json turbo.json
 {
     "remoteCache": {
-        "apiUrl": "https://cache.example.com",
-        "teamSlug": "my-team"
+        "apiUrl": "https://cache.example.com", // [!code highlight]
+        "teamSlug": "my-team" // [!code highlight]
     }
 }
 ```
 
 Use your server's bare HTTPS origin with no trailing slash and no `/v8` suffix. `teamSlug` can be any identifier you want; machines sharing artifacts just need to agree on the same value. Keep in mind that teams separate artifact namespaces rather than permissions (see [Security model and trade-offs](/introduction#one-token-opens-every-team)).
 
-Commit `turbo.json`, then export `TURBO_TOKEN` in each developer's shell profile (or load it via direnv / your secret manager):
+Commit `turbo.json`, then export `TURBO_TOKEN` in each developer's shell profile (or load it via direnv or your secret manager):
 
 ```sh
 export TURBO_TOKEN='<your-token>'
@@ -65,7 +77,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         env:
-            TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+            TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }} # [!code highlight]
         steps:
             - uses: actions/checkout@v7
             # Install Node.js and dependencies here
@@ -99,6 +111,10 @@ npm exec -- turbo run build
 </Tabs>
 
 ## Check that hits come from the server
+
+Test connectivity and storage wiring right from your browser, then confirm an end-to-end `turbo` cache replay:
+
+<ConnectionTester />
 
 <include>/_snippets/verify-remote-cache.mdx</include>
 

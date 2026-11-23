@@ -15,26 +15,37 @@ For most monorepos, [Cloudflare R2](/storage/r2) is a better fit.
 ## Bind a KV namespace
 
 <Steps>
-    <Step title="Add the KV_STORE binding">
-        Add `kv_namespaces` to `apps/api/wrangler.jsonc`:
+    <Step title="Replace the R2 binding with KV_STORE">
+        Update `apps/api/wrangler.jsonc` to bind `KV_STORE` (omitting `id` lets `wrangler deploy` create a new namespace automatically; include `id` to reuse an existing one). Removing `r2_buckets` is optional—`KV_STORE` takes precedence when both are bound—but keeps your config clean:
 
-        ```jsonc apps/api/wrangler.jsonc
-        {
-            "kv_namespaces": [{ "binding": "KV_STORE" }],
-        }
-        ```
+        <Diff
+            lang="jsonc"
+            old={`{
 
-        Omitting `id` lets `wrangler deploy` create and bind a new namespace automatically. To reuse an existing namespace, include its `id`.
-    </Step>
-    <Step title="Remove the R2 binding (optional)">
-        When both `KV_STORE` and `R2_STORE` are bound, `KV_STORE` wins automatically. Remove `r2_buckets` from `wrangler.jsonc` if you no longer need the unused R2 binding.
-    </Step>
-    <Step title="Rebuild and deploy">
-        ```sh
+"r2_buckets": [
+{
+"binding": "R2_STORE",
+"bucket_name": "turborepo-cache",
+"preview_bucket_name": "turborepo-cache-preview"
+}
+]
+}`}
+            new={`{
+"kv_namespaces": [
+{
+"binding": "KV_STORE"
+}
+]
+}`}
+/>
+
+</Step>
+<Step title="Rebuild and deploy">
+`sh
         pnpm build
         pnpm run deploy
-        ```
-    </Step>
+        `
+</Step>
 
 </Steps>
 

@@ -47,14 +47,40 @@ S3_ENDPOINT=http://minio.internal:9000
 S3_REGION=us-east-1
 S3_ACCESS_KEY_ID=<access-key>
 S3_SECRET_ACCESS_KEY=<secret-key>
-S3_FORCE_PATH_STYLE=true
+S3_FORCE_PATH_STYLE=true # [!code highlight]
 ```
 
 If every cache lookup returns a miss on a new self-hosted S3 setup, check `S3_FORCE_PATH_STYLE` first.
 
 ## Using S3 on Cloudflare Workers
 
-Cloudflare bindings take priority over `S3_*` variables. Remove the `r2_buckets` entry from `apps/api/wrangler.jsonc`, add `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION` under `vars`, and store your credentials as Worker secrets:
+Cloudflare bindings take priority over `S3_*` variables. Remove `r2_buckets` from `apps/api/wrangler.jsonc` and add your S3 bucket, endpoint, and region under `vars`:
+
+<Diff
+    lang="jsonc"
+    old={`{
+  "vars": {
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2_STORE",
+      "bucket_name": "turborepo-cache",
+      "preview_bucket_name": "turborepo-cache-preview"
+    }
+  ]
+}`}
+    new={`{
+  "vars": {
+    "BUCKET_OBJECT_EXPIRATION_HOURS": 720,
+    "S3_BUCKET": "my-turborepo-cache",
+    "S3_ENDPOINT": "https://s3.us-east-1.amazonaws.com",
+    "S3_REGION": "us-east-1"
+  }
+}`}
+/>
+
+Then store your access keys as Worker secrets:
 
 ```sh
 cd apps/api

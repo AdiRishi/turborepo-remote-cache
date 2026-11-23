@@ -7,6 +7,10 @@ Because the server is a [Nitro](https://nitro.build) application, the same codeb
 
 **Cloudflare Workers is the recommended default.** It's the only target that provisions artifact storage (R2), scheduled expiry, and a stats database (D1) automatically, and it's the target tested end-to-end against the real `turbo` CLI in CI.
 
+<StackAdvisor />
+
+## Feature matrix
+
 | Platform                                 | Artifact storage                        | Scheduled expiry     | Stats database                              |
 | ---------------------------------------- | --------------------------------------- | -------------------- | ------------------------------------------- |
 | [Cloudflare Workers](/deploy/cloudflare) | R2 (default), KV, S3, or custom adapter | Built-in cron        | D1 (auto-created on first deploy)           |

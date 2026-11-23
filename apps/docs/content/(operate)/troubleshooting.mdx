@@ -3,7 +3,9 @@ title: Troubleshooting
 description: Diagnose connection failures, persistent cache misses, failed uploads, 500 errors, and missing dashboard analytics.
 ---
 
-Because `turbo` falls back silently to local execution whenever remote caching fails, a passing build doesn't prove your remote cache was used. Match your symptom below. Commands assume `CACHE_URL` holds your server origin and `TURBO_TOKEN` holds your bearer token.
+Because `turbo` falls back silently to local execution whenever remote caching fails, a passing build doesn't prove your remote cache was used. Run a live check against your deployment below, or jump straight to your symptom.
+
+<ConnectionTester />
 
 ## `turbo` cannot connect
 
@@ -15,7 +17,7 @@ If `turbo` prints a warning instead of `Remote caching enabled`, check the messa
 | `Remote caching unavailable (Authentication failed ...)`                         | Client `TURBO_TOKEN` doesn't match the server's secret. |
 | `Remote caching unavailable (Could not connect to "https://cache.example.com/")` | Wrong URL or trailing slash in `apiUrl` / `TURBO_API`.  |
 
-Test reachability and authentication directly:
+You can also test reachability and authentication from your terminal (assuming `CACHE_URL` holds your server origin and `TURBO_TOKEN` holds your bearer token):
 
 ```sh
 curl --fail-with-body "$CACHE_URL/ping"
@@ -24,13 +26,27 @@ curl --fail-with-body -H "Authorization: Bearer $TURBO_TOKEN" "$CACHE_URL/v8/art
 
 Expect `pong` followed by `{"status":"enabled"}`.
 
-| Result                                        | What to check                                                                                                                                             |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DNS, TLS, or connection error                 | Confirm the deployment URL is reachable and uses the bare HTTPS origin (no trailing slash, no `/v8`).                                                     |
-| HTML response or login redirect               | Deployment protection or an access proxy (Cloudflare Access, Vercel Protection) is blocking `/v8/*`. Allow bearer-authenticated requests through `/v8/*`. |
-| `401`                                         | `TURBO_TOKEN` is missing or doesn't match the server's `TURBO_TOKEN`.                                                                                     |
-| `500`                                         | Check server logs. See [The server returns 500](#the-server-returns-500).                                                                                 |
-| `curl` succeeds, but `turbo` disables caching | Verify `teamSlug` / `TURBO_TEAM` is set and check for stale `TURBO_*` environment variables overriding `turbo.json`.                                      |
+<Accordion>
+    <AccordionItem title="DNS, TLS, or connection error">
+        Confirm the deployment URL is reachable and uses the bare HTTPS origin (no trailing slash,
+        no `/v8`).
+    </AccordionItem>
+    <AccordionItem title="HTML response or login redirect">
+        Deployment protection or an access proxy (Cloudflare Access, Vercel Protection) is blocking
+        `/v8/*`. Allow bearer-authenticated requests through `/v8/*`.
+    </AccordionItem>
+    <AccordionItem title="HTTP 401 Unauthorized">
+        `TURBO_TOKEN` is missing or doesn't match the server's `TURBO_TOKEN` secret.
+    </AccordionItem>
+    <AccordionItem title="HTTP 500 Server Error">
+        Check server logs for `Invalid server configuration:`. See [The server returns
+        500](#the-server-returns-500).
+    </AccordionItem>
+    <AccordionItem title="curl succeeds, but turbo disables remote caching">
+        Verify `teamSlug` / `TURBO_TEAM` is set and check for stale `TURBO_*` environment variables
+        overriding `turbo.json`.
+    </AccordionItem>
+</Accordion>
 
 `/ping` only confirms the process is running; run the [remote-hit check](/connect-turbo#check-that-hits-come-from-the-server) to validate the full upload/download path.
 

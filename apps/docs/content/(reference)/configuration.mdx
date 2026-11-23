@@ -9,45 +9,117 @@ On Cloudflare Workers, configuration comes from Worker bindings, `vars`, and sec
 
 ## Core variables
 
-| Variable                         | Required | Default | Description                                                                                                      |
-| -------------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
-| `TURBO_TOKEN`                    | Yes      | —       | Non-empty bearer token required on `/v8/*` and `/internal/*` (compared in constant time via SHA-256).            |
-| `BUCKET_OBJECT_EXPIRATION_HOURS` | No       | `720`   | Artifact retention in whole hours (`>= 1`). Also sets KV write-time TTL. See [Retention and expiry](/retention). |
+<TypeTable
+    type={{
+        TURBO_TOKEN: {
+            type: 'string',
+            required: true,
+            description:
+                'Non-empty bearer token required on /v8/* and /internal/* (compared in constant time via SHA-256).',
+        },
+        BUCKET_OBJECT_EXPIRATION_HOURS: {
+            type: 'integer (>= 1)',
+            default: '720',
+            description:
+                'Artifact retention window in whole hours. Also sets the write-time TTL for Workers KV. See Retention and expiry.',
+        },
+    }}
+/>
 
 ## Cloudflare bindings
 
 Available only on Cloudflare Workers (`apps/api/wrangler.jsonc`):
 
-| Binding    | Resource     | Description                                                          |
-| ---------- | ------------ | -------------------------------------------------------------------- |
-| `KV_STORE` | KV namespace | Stores artifacts in [Workers KV](/storage/kv). Overrides `R2_STORE`. |
-| `R2_STORE` | R2 bucket    | Stores artifacts in [Cloudflare R2](/storage/r2) (default).          |
-| `STATS_DB` | D1 database  | Stores analytics for the [dashboard](/dashboard). Optional.          |
+<TypeTable
+    type={{
+        KV_STORE: {
+            type: 'KVNamespace',
+            description: 'Stores artifacts in Workers KV. Overrides R2_STORE when both are bound.',
+        },
+        R2_STORE: {
+            type: 'R2Bucket',
+            description: 'Stores artifacts in Cloudflare R2 (default Cloudflare backend).',
+        },
+        STATS_DB: {
+            type: 'D1Database',
+            description: 'Stores analytics for the built-in dashboard. Optional.',
+        },
+    }}
+/>
 
 ## S3 variables
 
 Setting `S3_BUCKET` enables [S3-compatible storage](/storage/s3) when no custom adapter and no Cloudflare storage binding (`KV_STORE` / `R2_STORE`) is configured.
 
-| Variable               | Required    | Default                                                   | Description                                                                                |
-| ---------------------- | ----------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `S3_BUCKET`            | Yes, for S3 | —                                                         | Non-empty bucket name.                                                                     |
-| `S3_ENDPOINT`          | Yes, for S3 | —                                                         | S3 API endpoint URL (e.g. `https://s3.us-east-1.amazonaws.com`). Only the origin is used.  |
-| `S3_REGION`            | No          | `AWS_REGION`, then `AWS_DEFAULT_REGION`, then `us-east-1` | Signing region. Set `auto` for Cloudflare R2.                                              |
-| `S3_ACCESS_KEY_ID`     | No          | `AWS_ACCESS_KEY_ID`                                       | Access key ID.                                                                             |
-| `S3_SECRET_ACCESS_KEY` | No          | `AWS_SECRET_ACCESS_KEY`                                   | Secret access key.                                                                         |
-| `S3_SESSION_TOKEN`     | No          | `AWS_SESSION_TOKEN` (when using `AWS_*` keys)             | Temporary session token for IAM roles.                                                     |
-| `S3_FORCE_PATH_STYLE`  | No          | `false`                                                   | Set `true` to address `<endpoint>/<bucket>` instead of `<bucket>.<endpoint>` (e.g. MinIO). |
+<TypeTable
+    type={{
+        S3_BUCKET: {
+            type: 'string',
+            required: true,
+            description: 'Non-empty bucket name (required when using S3 storage).',
+        },
+        S3_ENDPOINT: {
+            type: 'string (URL)',
+            required: true,
+            description:
+                'S3 API endpoint URL, such as https://s3.us-east-1.amazonaws.com. Only the origin is used.',
+        },
+        S3_REGION: {
+            type: 'string',
+            default: 'AWS_REGION → AWS_DEFAULT_REGION → us-east-1',
+            description: 'Signing region. Set to auto for Cloudflare R2.',
+        },
+        S3_ACCESS_KEY_ID: {
+            type: 'string',
+            default: 'AWS_ACCESS_KEY_ID',
+            description: 'Access key ID.',
+        },
+        S3_SECRET_ACCESS_KEY: {
+            type: 'string',
+            default: 'AWS_SECRET_ACCESS_KEY',
+            description: 'Secret access key.',
+        },
+        S3_SESSION_TOKEN: {
+            type: 'string',
+            default: 'AWS_SESSION_TOKEN (with AWS_* keys)',
+            description: 'Temporary session token for IAM execution roles.',
+        },
+        S3_FORCE_PATH_STYLE: {
+            type: '"true" | "false"',
+            default: '"false"',
+            description:
+                'Set "true" to address <endpoint>/<bucket> instead of <bucket>.<endpoint> (required by MinIO and most self-hosted S3 stores).',
+        },
+    }}
+/>
 
 `AWS_*` fallbacks are read strictly from the process environment; `~/.aws` profiles and SSO sessions are not loaded.
 
 ## Build and platform variables
 
-| Variable       | Scope                  | Description                                                                                                            |
-| -------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `NITRO_PRESET` | Build                  | Nitro deployment target (e.g. `node_server`, `aws_lambda`). Defaults to `cloudflare_module`. See [Platforms](/deploy). |
-| `PORT`         | Node.js, Bun, and Deno | HTTP listening port. Defaults to `3000`.                                                                               |
-| `HOST`         | Node.js, Bun, and Deno | Network interface / host address to bind.                                                                              |
-| `CRON_SECRET`  | Vercel                 | Bearer secret verified on Vercel Cron requests to `/_vercel/cron`. See [Vercel](/deploy/vercel).                       |
+<TypeTable
+    type={{
+        NITRO_PRESET: {
+            type: 'string',
+            default: '"cloudflare_module"',
+            description:
+                'Build-time Nitro target (e.g. node_server, bun, deno_server, vercel, netlify, aws_lambda).',
+        },
+        PORT: {
+            type: 'number',
+            default: '3000',
+            description: 'HTTP listening port on Node.js, Bun, and Deno.',
+        },
+        HOST: {
+            type: 'string',
+            description: 'Network interface / host address to bind on Node.js, Bun, and Deno.',
+        },
+        CRON_SECRET: {
+            type: 'string',
+            description: 'Bearer secret verified on Vercel Cron requests to /_vercel/cron.',
+        },
+    }}
+/>
 
 A [custom storage adapter](/storage/custom-adapter) can read any additional variables you define.
 
